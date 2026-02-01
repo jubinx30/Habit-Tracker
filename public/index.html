@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a0a1f 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: #1a1a2e;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1 {
+            color: #e0e0e0;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #b0b0b0;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .habit-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+            background: #2a2a3e;
+            color: #e0e0e0;
+        }
+
+        .habit-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .habit-input::placeholder {
+            color: #888;
+        }
+        
+        .add-btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .add-btn:active {
+            transform: translateY(0);
+        }
+
+        .habits-section {
+            margin-bottom: 30px;
+        }
+
+        .habit-list {
+            list-style: none;
+        }
+
+        .habit-item {
+            background: #252540;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            padding: 15px;
+            transition: background 0.3s, border-left 0.3s;
+            border-left: 4px solid #444;
+        }
+
+        .habit-item.habit-red { border-left-color: #e53935; }
+        .habit-item.habit-blue { border-left-color: #1e88e5; }
+        .habit-item.habit-green { border-left-color: #43a047; }
+        .habit-item.habit-orange { border-left-color: #fb8c00; }
+        .habit-item.habit-purple { border-left-color: #8e24aa; }
+        .habit-item.habit-pink { border-left-color: #c2185b; }
+        .habit-item.habit-teal { border-left-color: #00897b; }
+        .habit-item.habit-indigo { border-left-color: #3949ab; }
+
+        .habit-item.completed {
+            opacity: 0.7;
+        }
+
+        .habit-item.completed .habit-text {
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .habit-text {
+            flex: 1;
+            color: #e0e0e0;
+            font-size: 1.1em;
+        }
+
+        .delete-btn {
+            padding: 6px 12px;
+            background: #e53935;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #c62828;
+        }
+
+        .stats-section {
+            background: #252540;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .stats-section p {
+            color: #b0b0b0;
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+
+        .stats-section span {
+            font-weight: bold;
+            color: #80d0ff;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .habit-item-content {
+            width: 100%;
+        }
+
+        .habit-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .chart-container {
+            margin-top: 12px;
+            position: relative;
+        }
+        
+        .chart-days-header {
+            display: grid;
+            grid-template-columns: repeat(52, 24px);
+            gap: 4px;
+            padding: 0 0 8px 0;
+            font-size: 0.75em;
+            color: #888;
+            font-weight: 600;
+            overflow: hidden;
+        }
+        
+        .chart-day-label {
+            text-align: center;
+        }
+
+        .habit-chart {
+            display: grid;
+            grid-template-columns: repeat(52, 24px);
+            grid-template-rows: repeat(7, 24px);
+            gap: 4px;
+            padding: 10px 0;
+            grid-auto-flow: column;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        
+        .chart-container {
+            position: relative;
+        }
+        
+        .chart-days-header,
+        .habit-chart {
+            scrollbar-width: thin;
+        }
+        
+        .habit-chart::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .habit-chart::-webkit-scrollbar-track {
+            background: #252540;
+            border-radius: 4px;
+        }
+        
+        .habit-chart::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        .habit-chart::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .chart-day {
+            width: 100%;
+            height: 100%;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #444;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chart-day:hover {
+            transform: scale(1.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
+        }
+
+        .chart-day.empty { background-color: #2a2a3e; }
+        .chart-day.low { background-color: #7ec850; }
+        .chart-day.medium { background-color: #239a3b; }
+        .chart-day.high { background-color: #0d5e2e; }
+
+        .chart-day.chart-red.low { background-color: #ef5350; }
+        .chart-day.chart-red.medium { background-color: #d32f2f; }
+        .chart-day.chart-red.high { background-color: #b71c1c; }
+
+        .chart-day.chart-blue.low { background-color: #42a5f5; }
+        .chart-day.chart-blue.medium { background-color: #1e88e5; }
+        .chart-day.chart-blue.high { background-color: #1351dd; }
+
+        .chart-day.chart-green.low { background-color: #66bb6a; }
+        .chart-day.chart-green.medium { background-color: #2e7d32; }
+        .chart-day.chart-green.high { background-color: #1b5e20; }
+
+        .chart-day.chart-orange.low { background-color: #ffa726; }
+        .chart-day.chart-orange.medium { background-color: #f57c00; }
+        .chart-day.chart-orange.high { background-color: #e65100; }
+
+        .chart-day.chart-purple.low { background-color: #ab47bc; }
+        .chart-day.chart-purple.medium { background-color: #8e24aa; }
+        .chart-day.chart-purple.high { background-color: #6a1b9a; }
+
+        .chart-day.chart-pink.low { background-color: #ec407a; }
+        .chart-day.chart-pink.medium { background-color: #c2185b; }
+        .chart-day.chart-pink.high { background-color: #880e4f; }
+
+        .chart-day.chart-teal.low { background-color: #b2dfdb; }
+        .chart-day.chart-teal.medium { background-color: #26a69a; }
+        .chart-day.chart-teal.high { background-color: #00695c; }
+
+        .chart-day.chart-indigo.low { background-color: #c5cae9; }
+        .chart-day.chart-indigo.medium { background-color: #5e35b1; }
+        .chart-day.chart-indigo.high { background-color: #283593; }
+
+        .chart-tooltip {
+            position: relative;
+        }
+
+        .chart-tooltip::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a2e;
+            color: #e0e0e0;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 1000;
+            border: 1px solid #444;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .chart-tooltip:hover::before {
+            opacity: 1;
+        }
+
+        .habit-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        .stat-item {
+            display: flex;
+            gap: 5px;
+        }
+
+        .stat-item strong {
+            color: #c0c0c0;
+        }
+
+        .loading {
+            text-align: center;
+            color: #888;
+            padding: 20px;
+        }
+
+        .sync-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #252540;
+            border-radius: 8px;
+            color: #80d0ff;
+            font-size: 0.9em;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .sync-status.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Habit Tracker</h1>
+        
+        <div class="input-section">
+            <input 
+                type="text" 
+                id="habitInput" 
+                placeholder="Enter a new habit..." 
+                class="habit-input"
+            >
+            <button id="addBtn" class="add-btn">Add Habit</button>
+        </div>
+        
+        <div class="habits-section">
+            <h2>Your Habits</h2>
+            <ul id="habitList" class="habit-list">
+                <li class="loading">Loading habits...</li>
+            </ul>
+        </div>
+        
+        <div class="stats-section">
+            <p>Total Habits: <span id="totalCount">0</span></p>
+            <p>Completed Today: <span id="completedCount">0</span></p>
+        </div>
+    </div>
+
+    <div class="sync-status" id="syncStatus">Syncing...</div>
+
+    <script>
+        // Configuration - MAKE SURE THIS MATCHES YOUR BACKEND
+        const API_URL = 'http://localhost:3000/api';
+        
+        console.log('API URL:', API_URL); // Debug log
+        
+        // Test backend connection immediately
+        fetch(`${API_URL}/admin/all-habits`)
+            .then(r => r.json())
+            .then(data => console.log('Backend connected! Habits:', data))
+            .catch(err => console.error('Backend connection failed:', err));
+        
+        // Generate or get user ID
+        let userId = localStorage.getItem('userId');
+        if (!userId) {
+            userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('userId', userId);
+        }
+        
+        console.log('Your User ID:', userId); // Debug log
+
+        const habitInput = document.getElementById('habitInput');
+        const addBtn = document.getElementById('addBtn');
+        const habitList = document.getElementById('habitList');
+        const totalCount = document.getElementById('totalCount');
+        const completedCount = document.getElementById('completedCount');
+        const syncStatus = document.getElementById('syncStatus');
+
+        const COLOR_PALETTE = [
+            { name: 'red', light: '#ffebee', dark: '#e53935' },
+            { name: 'blue', light: '#e3f2fd', dark: '#1e88e5' },
+            { name: 'green', light: '#e8f5e9', dark: '#43a047' },
+            { name: 'orange', light: '#fff3e0', dark: '#fb8c00' },
+            { name: 'purple', light: '#f3e5f5', dark: '#8e24aa' },
+            { name: 'pink', light: '#fce4ec', dark: '#c2185b' },
+            { name: 'teal', light: '#e0f2f1', dark: '#00897b' },
+            { name: 'indigo', light: '#e8eaf6', dark: '#3949ab' }
+        ];
+
+        let habits = [];
+        let syncTimeout = null;
+        let pendingSync = false;
+
+        // Show sync status
+        function showSyncStatus(message) {
+            syncStatus.textContent = message;
+            syncStatus.classList.add('show');
+            setTimeout(() => syncStatus.classList.remove('show'), 2000);
+        }
+
+        // Debounced sync - waits 500ms after last change before syncing
+        function scheduleSyncAll() {
+            clearTimeout(syncTimeout);
+            pendingSync = true;
+            
+            syncTimeout = setTimeout(async () => {
+                await syncAllHabits();
+                pendingSync = false;
+            }, 500);
+        }
+
+        // Sync all habits at once (much faster than individual updates)
+        async function syncAllHabits() {
+            try {
+                const habitsToSync = habits.map(h => {
+                    // Convert completionHistory to plain object for MongoDB
+                    let completionHistory = {};
+                    if (h.completionHistory && typeof h.completionHistory === 'object') {
+                        completionHistory = h.completionHistory;
+                    }
+                    
+                    return {
+                        ...h,
+                        completionHistory
+                    };
+                });
+                
+                await fetch(`${API_URL}/habits/sync`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, habits: habitsToSync })
+                });
+                
+                showSyncStatus('✓ Synced');
+            } catch (error) {
+                console.error('Error syncing habits:', error);
+                showSyncStatus('✗ Sync failed');
+            }
+        }
+
+        // API Functions
+        async function fetchHabits() {
+            try {
+                const response = await fetch(`${API_URL}/habits/${userId}`);
+                const data = await response.json();
+                
+                // Convert MongoDB Map to plain object
+                habits = data.map(h => {
+                    let completionHistory = {};
+                    
+                    // Handle if completionHistory is a Map object from MongoDB
+                    if (h.completionHistory) {
+                        if (h.completionHistory instanceof Map) {
+                            completionHistory = Object.fromEntries(h.completionHistory);
+                        } else if (typeof h.completionHistory === 'object') {
+                            // It's already an object, just use it
+                            completionHistory = h.completionHistory;
+                        }
+                    }
+                    
+                    return {
+                        ...h,
+                        completionHistory
+                    };
+                });
+                
+                renderHabits();
+            } catch (error) {
+                console.error('Error fetching habits:', error);
+                habitList.innerHTML = '<li class="empty-state">Error loading habits. Make sure the backend server is running.</li>';
+            }
+        }
+
+        async function saveHabit(habit) {
+            // Just schedule a sync instead of immediate API call
+            scheduleSyncAll();
+        }
+
+        async function updateHabit(habit) {
+            // Just schedule a sync instead of immediate API call
+            scheduleSyncAll();
+        }
+
+        async function deleteHabitAPI(id) {
+            // Just schedule a sync instead of immediate API call
+            scheduleSyncAll();
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', fetchHabits);
+
+        // Add habit on button click
+        addBtn.addEventListener('click', addHabit);
+
+        // Add habit on Enter key press
+        habitInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addHabit();
+            }
+        });
+
+        async function addHabit() {
+            const habitText = habitInput.value.trim();
+            
+            if (habitText === '') {
+                alert('Please enter a habit!');
+                return;
+            }
+            
+            const colorIndex = habits.length % COLOR_PALETTE.length;
+            const habit = {
+                id: Date.now(),
+                text: habitText,
+                completed: false,
+                dateAdded: new Date().toLocaleDateString(),
+                colorName: COLOR_PALETTE[colorIndex].name,
+                completionHistory: {}
+            };
+            
+            habits.push(habit);
+            await saveHabit(habit);
+            renderHabits();
+            habitInput.value = '';
+            habitInput.focus();
+        }
+
+        async function deleteHabit(id) {
+            habits = habits.filter(habit => habit.id !== id);
+            await deleteHabitAPI(id);
+            renderHabits();
+        }
+
+        async function toggleHabit(id) {
+            const habit = habits.find(h => h.id === id);
+            if (habit) {
+                const today = getDateString(new Date());
+                
+                if (!habit.completionHistory) {
+                    habit.completionHistory = {};
+                }
+                
+                if (habit.completionHistory[today]) {
+                    habit.completionHistory[today]--;
+                    if (habit.completionHistory[today] <= 0) {
+                        delete habit.completionHistory[today];
+                    }
+                } else {
+                    habit.completionHistory[today] = (habit.completionHistory[today] || 0) + 1;
+                }
+                
+                habit.completed = habit.completionHistory[today] > 0;
+                renderHabits();
+                scheduleSyncAll();
+            }
+        }
+
+        async function toggleDayCompletion(habitId, dateStr) {
+            const habit = habits.find(h => h.id === habitId);
+            if (habit) {
+                if (!habit.completionHistory) {
+                    habit.completionHistory = {};
+                }
+                
+                if (habit.completionHistory[dateStr]) {
+                    delete habit.completionHistory[dateStr];
+                } else {
+                    habit.completionHistory[dateStr] = 1;
+                }
+                
+                renderHabits();
+                scheduleSyncAll();
+            }
+        }
+
+        function renderHabits() {
+            habitList.innerHTML = '';
+            
+            if (habits.length === 0) {
+                habitList.innerHTML = '<li class="empty-state">No habits yet. Add one to get started!</li>';
+                updateStats();
+                return;
+            }
+            
+            habits.forEach(habit => {
+                const li = document.createElement('li');
+                const colorName = habit.colorName || COLOR_PALETTE[habits.indexOf(habit) % COLOR_PALETTE.length].name;
+                li.className = `habit-item habit-${colorName}`;
+                
+                const today = getDateString(new Date());
+                const completedToday = habit.completionHistory && habit.completionHistory[today] > 0;
+                
+                if (completedToday) {
+                    li.classList.add('completed');
+                }
+                
+                const chart = generateActivityChart(habit.id, habit.completionHistory || {}, colorName);
+                const stats = getHabitStats(habit.completionHistory || {});
+                
+                li.innerHTML = `
+                    <div class="habit-item-content">
+                        <div class="habit-header">
+                            <input 
+                                type="checkbox" 
+                                class="checkbox" 
+                                ${completedToday ? 'checked' : ''}
+                                onchange="toggleHabit(${habit.id})"
+                            >
+                            <span class="habit-text">${habit.text}</span>
+                            <button class="delete-btn" onclick="deleteHabit(${habit.id})">Delete</button>
+                        </div>
+                        <div class="habit-stats">
+                            <div class="stat-item">
+                                <strong>${stats.thisWeek}</strong> this week
+                            </div>
+                            <div class="stat-item">
+                                <strong>${stats.thisMonth}</strong> this month
+                            </div>
+                            <div class="stat-item">
+                                <strong>${stats.total}</strong> total
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-days-header" id="header-${habit.id}">
+                                ${chart.headers}
+                            </div>
+                            <div class="habit-chart" id="chart-${habit.id}">
+                                ${chart.chart}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                habitList.appendChild(li);
+                
+                // Sync scroll between header and chart
+                const chartEl = document.getElementById(`chart-${habit.id}`);
+                const headerEl = document.getElementById(`header-${habit.id}`);
+                
+                if (chartEl && headerEl) {
+                    chartEl.addEventListener('scroll', () => {
+                        headerEl.scrollLeft = chartEl.scrollLeft;
+                    });
+                }
+            });
+            
+            updateStats();
+        }
+
+        function generateActivityChart(habitId, completionHistory, colorName = 'blue') {
+            const totalDays = 364;
+            const today = new Date();
+            const dayLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+            let chart = '';
+            let headers = '';
+            
+            for (let col = 0; col < 52; col++) {
+                const dayLabel = dayLabels[col % 7];
+                headers += `<div class="chart-day-label">${dayLabel}</div>`;
+            }
+            
+            for (let dayIndex = totalDays - 1; dayIndex >= 0; dayIndex--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - dayIndex);
+                const dateStr = getDateString(date);
+                const count = completionHistory[dateStr] || 0;
+                
+                let level = 'empty';
+                if (count >= 4) level = 'high';
+                else if (count >= 2) level = 'medium';
+                else if (count >= 1) level = 'low';
+                
+                const dateFormatted = date.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric'
+                });
+                
+                chart += `
+                    <div 
+                        class="chart-day chart-tooltip ${level} chart-${colorName}" 
+                        data-tooltip="${dateFormatted}"
+                        onclick="toggleDayCompletion(${habitId}, '${dateStr}')"
+                        style="cursor: pointer;"
+                    ></div>
+                `;
+            }
+            
+            return { headers, chart };
+        }
+
+        function getDateString(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function getHabitStats(completionHistory) {
+            const today = new Date();
+            const thisWeekStart = new Date(today);
+            thisWeekStart.setDate(today.getDate() - today.getDay());
+            
+            const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            let thisWeek = 0;
+            let thisMonth = 0;
+            let total = 0;
+            
+            Object.entries(completionHistory).forEach(([dateStr, count]) => {
+                const date = new Date(dateStr);
+                total += count;
+                
+                if (date >= thisMonthStart) {
+                    thisMonth += count;
+                }
+                
+                if (date >= thisWeekStart) {
+                    thisWeek += count;
+                }
+            });
+            
+            return { thisWeek, thisMonth, total };
+        }
+
+        function updateStats() {
+            totalCount.textContent = habits.length;
+            
+            const today = getDateString(new Date());
+            const completedToday = habits.filter(h => 
+                h.completionHistory && h.completionHistory[today] > 0
+            ).length;
+            
+            completedCount.textContent = completedToday;
+        }
+
+        // Make functions globally accessible
+        window.deleteHabit = deleteHabit;
+        window.toggleHabit = toggleHabit;
+        window.toggleDayCompletion = toggleDayCompletion;
+    </script>
+</body>
+</html>
