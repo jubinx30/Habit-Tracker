@@ -687,6 +687,10 @@
                     chartEl.addEventListener('scroll', () => {
                         headerEl.scrollLeft = chartEl.scrollLeft;
                     });
+                    
+                    // Scroll to the end to show the current day
+                    chartEl.scrollLeft = chartEl.scrollWidth;
+                    headerEl.scrollLeft = headerEl.scrollWidth;
                 }
             });
             
