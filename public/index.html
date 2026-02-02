@@ -11,10 +11,6 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --chart-cell-size: 24px;
-        }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #0f0f1e 0%, #1a0a1f 100%);
@@ -200,7 +196,7 @@
         
         .chart-days-header {
             display: grid;
-            grid-template-columns: repeat(52, var(--chart-cell-size));
+            grid-template-columns: repeat(52, 24px);
             gap: 4px;
             padding: 0 0 8px 0;
             font-size: 0.75em;
@@ -215,8 +211,8 @@
 
         .habit-chart {
             display: grid;
-            grid-template-columns: repeat(52, var(--chart-cell-size));
-            grid-template-rows: repeat(7, var(--chart-cell-size));
+            grid-template-columns: repeat(52, 24px);
+            grid-template-rows: repeat(7, 24px);
             gap: 4px;
             padding: 10px 0;
             grid-auto-flow: column;
@@ -374,86 +370,6 @@
         .sync-status.show {
             opacity: 1;
         }
-
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
-            :root {
-                --chart-cell-size: 16px;
-            }
-
-            body {
-                padding: 10px;
-            }
-
-            .container {
-                padding: 20px;
-                border-radius: 10px;
-            }
-
-            h1 {
-                font-size: 2em;
-                margin-bottom: 20px;
-            }
-
-            h2 {
-                font-size: 1.1em;
-                margin-bottom: 15px;
-            }
-
-            .input-section {
-                flex-direction: column;
-                gap: 15px;
-                margin-bottom: 20px;
-            }
-
-            .habit-input {
-                padding: 10px 12px;
-                font-size: 1em;
-            }
-
-            .add-btn {
-                padding: 10px 20px;
-                font-size: 1em;
-            }
-
-            .habit-item {
-                padding: 12px;
-            }
-
-            .habit-header {
-                gap: 10px;
-            }
-
-            .habit-text {
-                font-size: 1em;
-            }
-
-            .delete-btn {
-                padding: 5px 10px;
-                font-size: 0.9em;
-            }
-
-            .habit-stats {
-                font-size: 0.85em;
-                gap: 10px;
-            }
-
-            .stats-section {
-                padding: 15px;
-            }
-
-            .stats-section p {
-                font-size: 0.9em;
-                margin-bottom: 6px;
-            }
-
-            .sync-status {
-                bottom: 10px;
-                right: 10px;
-                padding: 8px 15px;
-                font-size: 0.85em;
-            }
-        }
     </style>
 </head>
 <body>
@@ -486,16 +402,10 @@
     <div class="sync-status" id="syncStatus">Syncing...</div>
 
     <script>
-        // Configuration - MAKE SURE THIS MATCHES YOUR BACKEND
-        const API_URL = 'http://localhost:3000/api';
+        // Configuration - Use current domain for API
+        const API_URL = window.location.origin + '/api';
         
         console.log('API URL:', API_URL); // Debug log
-        
-        // Test backend connection immediately
-        fetch(`${API_URL}/admin/all-habits`)
-            .then(r => r.json())
-            .then(data => console.log('Backend connected! Habits:', data))
-            .catch(err => console.error('Backend connection failed:', err));
         
         // Generate or get user ID
         let userId = localStorage.getItem('userId');
@@ -777,10 +687,6 @@
                     chartEl.addEventListener('scroll', () => {
                         headerEl.scrollLeft = chartEl.scrollLeft;
                     });
-                    
-                    // Scroll to the end to show the current day
-                    chartEl.scrollLeft = chartEl.scrollWidth;
-                    headerEl.scrollLeft = headerEl.scrollWidth;
                 }
             });
             

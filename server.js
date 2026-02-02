@@ -5,14 +5,15 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
-console.log('🔍 MongoDB URI:', process.env.MONGODB_URI); // Add this line
-console.log('🔍 PORT:', process.env.PORT); // Add this line
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*', // Allow all origins - change to specific domain in production
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.static('public')); // Serve static files from 'public' folder
 
@@ -138,6 +139,20 @@ app.get('/api/health', (req, res) => {
     mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     timestamp: new Date().toISOString()
   });
+});
+
+// Debug endpoint - list all databases
+app.get('/api/admin/databases', async (req, res) => {
+  try {
+    const admin = mongoose.connection.db.admin();
+    const { databases } = await admin.listDatabases();
+    res.json({ 
+      databases: databases,
+      currentDatabase: mongoose.connection.db.databaseName
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.listen(PORT, () => {
